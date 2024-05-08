@@ -2,10 +2,6 @@ name: Cypress Test
 
 on: 
   workflow_dispatch:
-    inputs:
-     cli: 
-       description: Run by cypress node command 
-       default: node runner.js
 
 jobs:
   cypress-electron-tests:
@@ -18,7 +14,36 @@ jobs:
         run: yarn install
 
       - name: Run e2e tests
-        run: ${{ github.event.inputs.cli }}
+        run: node runner-electron.js
+    env:
+       TARGET_TOKEN_ELECTRON: ${{ secrets.TARGET_TOKEN_ELECTRON }}
      
+  cypress-chrome-tests:
+    needs: cypress-electron-tests
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Get Code
+        uses: actions/checkout@v3.3.0
 
+      - name: install dependencies
+        run: yarn install
 
+      - name: Run e2e tests
+        run: node runner-chrome.js
+    env:
+       TARGET_TOKEN_CHROME: ${{ secrets.TARGET_TOKEN_CHROME }}
+
+  cypress-firefox-tests:
+    needs: cypress-chrome-tests
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Get Code
+        uses: actions/checkout@v3.3.0
+
+      - name: install dependencies
+        run: yarn install
+
+      - name: Run e2e tests
+        run: node runner-firefox.js
+    env:
+       TARGET_TOKEN_FIREFOX: ${{ secrets.TARGET_TOKEN_FIREFOX }}
